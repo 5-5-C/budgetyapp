@@ -126,7 +126,6 @@ var budgetController = (function() {
         percentage: data.percentage
       }
     },
-
     testing: function() {
       console.log(data);
     }
@@ -176,6 +175,12 @@ var UIController = (function() {
     dec = numSplit[1];
 
     return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
+  };
+
+  var nodeListForEach = function(list, callback) {
+    for (var i = 0; i < list.length; i++) {
+      callback(list[i], i);
+    }
   };
 
   return {
@@ -234,7 +239,7 @@ var UIController = (function() {
 
     displayBudget: function(obj) {
       var type;
-      obj.budget > 0 ? type = 'inc' : type = 'exp';
+      obj.budget > 0 ? type = 'inc' : type = 'exp'; // before ? is the if statement and the first option is true and second is if the statement is false
 
       document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type);
       document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, 'inc');
@@ -250,12 +255,6 @@ var UIController = (function() {
 
     displayPercentages: function(percentages) {
       var fields = document.querySelectorAll(DOMstrings.expensesPercLabel);
-
-      var nodeListForEach = function(list, callback) {
-        for (var i = 0; i < list.length; i++) {
-          callback(list[i], i);
-        }
-      };
 
       nodeListForEach(fields, function(current, index) {
         if (percentages[index] > 0) {
@@ -275,6 +274,20 @@ var UIController = (function() {
 
       year = now.getFullYear();
       document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
+    },
+
+    changedType: function() {
+      var fields = document.querySelectorAll(
+        DOMstrings.inputType + ',' +
+        DOMstrings.inputDescription + ',' +
+        DOMstrings.inputValue);
+
+      nodeListForEach(fields, function(cur) {
+        cur.classList.toggle('red-focus');
+      });
+
+      document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
+
     },
 
     getDOMstrings: function() {
@@ -300,7 +313,9 @@ var controller = (function(budgetCtrl, UICtrl) {
 
     document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
 
-  }
+    document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);
+
+  };
 
 
   var updateBudget = function() {
